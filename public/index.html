@@ -22,7 +22,7 @@
         }
 
         header {
-            background-color: #1e1e1e;
+            background-color: #1a1a1a;
             padding: 12px 16px;
             display: flex;
             justify-content: space-between;
@@ -43,106 +43,79 @@
             overflow: hidden;
         }
 
-        @media (min-width: 768px) {
-            .container {
-                flex-direction: row;
-            }
-        }
-
         .player-section {
-            flex: 2;
+            flex: 1;
             background-color: #000000;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 10px;
+            position: relative;
+            min-height: 220px;
         }
 
         video {
             width: 100%;
-            max-height: 70vh;
-            background-color: #000;
-            outline: none;
+            height: 100%;
+            max-height: 40vh;
+            object-fit: contain;
         }
 
-        .url-box {
-            width: 100%;
+        .controls-bar {
             padding: 10px;
-            background-color: #1e1e1e;
+            background-color: #1a1a1a;
+            width: 100%;
             display: flex;
             gap: 8px;
         }
 
-        .url-box input {
+        .controls-bar input {
             flex: 1;
             padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid #333;
             background-color: #2c2c2c;
+            border: 1px solid #3c3c3c;
+            border-radius: 4px;
             color: #fff;
             font-size: 0.9rem;
         }
 
-        .url-box button {
+        .controls-bar button {
             padding: 8px 16px;
-            border-radius: 6px;
-            border: none;
             background-color: #e50914;
             color: white;
+            border: none;
+            border-radius: 4px;
             font-weight: bold;
             cursor: pointer;
         }
 
         .chat-section {
-            flex: 1;
+            height: 35vh;
             background-color: #181818;
             display: flex;
             flex-direction: column;
-            border-left: 1px solid #2c2c2c;
-            max-height: 40vh;
-        }
-
-        @media (min-width: 768px) {
-            .chat-section {
-                max-height: none;
-                width: 350px;
-            }
+            border-top: 1px solid #2c2c2c;
         }
 
         .chat-messages {
             flex: 1;
-            padding: 12px;
+            padding: 10px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .message {
-            max-width: 80%;
-            padding: 10px 14px;
-            border-radius: 12px;
+            background-color: #252525;
+            padding: 8px 12px;
+            border-radius: 6px;
             font-size: 0.9rem;
-            line-height: 1.4;
-            word-wrap: break-word;
+            max-width: 85%;
+            word-break: break-word;
         }
 
-        .message.received {
-            background-color: #2a2a2a;
-            color: #f1f1f1;
-            align-self: flex-start;
-            border-bottom-left-radius: 2px;
-        }
-
-        .message.sent {
-            background-color: #e50914;
-            color: #ffffff;
-            align-self: flex-end;
-            border-bottom-right-radius: 2px;
-        }
-
-        .chat-input-box {
+        .chat-input-bar {
             padding: 10px;
             background-color: #1e1e1e;
             display: flex;
@@ -150,25 +123,22 @@
             border-top: 1px solid #2c2c2c;
         }
 
-        .chat-input-box input {
+        .chat-input-bar input {
             flex: 1;
-            padding: 10px 14px;
-            border-radius: 20px;
-            border: 1px solid #333;
+            padding: 8px 12px;
             background-color: #2c2c2c;
+            border: 1px solid #3c3c3c;
+            border-radius: 4px;
             color: #fff;
-            font-size: 0.9rem;
-            outline: none;
         }
 
-        .chat-input-box button {
-            padding: 0 16px;
-            border-radius: 20px;
-            border: none;
-            background-color: #e50914;
+        .chat-input-bar button {
+            padding: 8px 16px;
+            background-color: #3b82f6;
             color: white;
+            border: none;
+            border-radius: 4px;
             font-weight: bold;
-            cursor: pointer;
         }
     </style>
 </head>
@@ -179,24 +149,29 @@
     </header>
 
     <div class="container">
+        <!-- Secção do Vídeo -->
         <div class="player-section">
             <video id="videoPlayer" controls crossorigin="anonymous"></video>
-            <div class="url-box">
-                <input type="text" id="videoUrlInput" placeholder="Cole o link direto do vídeo (.mp4)...">
-                <button id="loadVideoBtn">Carregar</button>
-            </div>
         </div>
 
+        <div class="controls-bar">
+            <input type="text" id="videoUrlInput" placeholder="Cole o link direto do vídeo (.mp4)...">
+            <button id="loadVideoBtn">Carregar</button>
+        </div>
+
+        <!-- Secção do Chat -->
         <div class="chat-section">
-            <div class="chat-messages" id="chatMessages"></div>
-            <div class="chat-input-box">
-                <input type="text" id="chatInput" placeholder="Digite sua mensagem...">
-                <button id="sendBtn">Enviar</button>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message"><b>Sistema:</b> Bem-vindo ao Llama! Partilhe o link com a sua namorada.</div>
+            </div>
+            <div class="chat-input-bar">
+                <input type="text" id="chatInput" placeholder="Escreva uma mensagem...">
+                <button id="sendChatBtn">Enviar</button>
             </div>
         </div>
     </div>
 
-    <!-- Socket.io injetado automaticamente pelo servidor Node.js -->
+    <!-- Socket.io do Servidor -->
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
@@ -206,83 +181,64 @@
         const loadVideoBtn = document.getElementById('loadVideoBtn');
         const chatMessages = document.getElementById('chatMessages');
         const chatInput = document.getElementById('chatInput');
-        const sendBtn = document.getElementById('sendBtn');
+        const sendChatBtn = document.getElementById('sendChatBtn');
 
-        let isRemoteAction = false;
-
-        // Carregar novo vídeo via URL
+        // Carregar vídeo localmente ou via input
         loadVideoBtn.addEventListener('click', () => {
             const url = videoUrlInput.value.trim();
             if (url) {
                 videoPlayer.src = url;
-                socket.emit('mudar video', url);
+                socket.emit('change-video', url);
             }
         });
 
-        socket.on('mudar video', (url) => {
-            isRemoteAction = true;
-            videoPlayer.src = url;
-            videoUrlInput.value = url;
-        });
-
-        // Sincronização de Play/Pause/Seek
-        videoPlayer.addEventListener('play', () => {
-            if (isRemoteAction) { isRemoteAction = false; return; }
-            socket.emit('play', { currentTime: videoPlayer.currentTime });
-        });
-
-        videoPlayer.addEventListener('pause', () => {
-            if (isRemoteAction) { isRemoteAction = false; return; }
-            socket.emit('pause', { currentTime: videoPlayer.currentTime });
-        });
-
-        videoPlayer.addEventListener('seeked', () => {
-            if (isRemoteAction) { isRemoteAction = false; return; }
-            socket.emit('seek', { currentTime: videoPlayer.currentTime });
-        });
-
-        socket.on('play', (data) => {
-            isRemoteAction = true;
-            videoPlayer.currentTime = data.currentTime;
-            videoPlayer.play();
-        });
-
-        socket.on('pause', (data) => {
-            isRemoteAction = true;
-            videoPlayer.currentTime = data.currentTime;
-            videoPlayer.pause();
-        });
-
-        socket.on('seek', (data) => {
-            isRemoteAction = true;
-            videoPlayer.currentTime = data.currentTime;
-        });
-
-        // Lógica do Chat
-        function appendMessage(text, type) {
-            const div = document.createElement('div');
-            div.className = `message ${type}`;
-            div.textContent = text;
-            chatMessages.appendChild(div);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
+        // Enviar mensagem de chat
         function sendMessage() {
             const text = chatInput.value.trim();
             if (text) {
-                appendMessage(text, 'sent');
-                socket.emit('chat message', text);
+                socket.emit('chat-message', text);
                 chatInput.value = '';
             }
         }
 
-        sendBtn.addEventListener('click', sendMessage);
+        sendChatBtn.addEventListener('click', sendMessage);
         chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
 
-        socket.on('chat message', (msg) => {
-            appendMessage(msg, 'received');
+        // Receber mensagens do chat do servidor
+        socket.on('chat-message', (data) => {
+            const div = document.createElement('div');
+            div.classList.add('message');
+            div.innerHTML = `<b>${data.user || 'Anónimo'}:</b> ${data.text}`;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+
+        // Sincronizar vídeo remotamente
+        socket.on('change-video', (url) => {
+            if (videoPlayer.src !== url) {
+                videoPlayer.src = url;
+            }
+        });
+
+        videoPlayer.addEventListener('play', () => {
+            socket.emit('video-action', { action: 'play', time: videoPlayer.currentTime });
+        });
+
+        videoPlayer.addEventListener('pause', () => {
+            socket.emit('video-action', { action: 'pause', time: videoPlayer.currentTime });
+        });
+
+        socket.on('video-action', (data) => {
+            if (Math.abs(videoPlayer.currentTime - data.time) > 1.5) {
+                videoPlayer.currentTime = data.time;
+            }
+            if (data.action === 'play') {
+                videoPlayer.play().catch(() => {});
+            } else {
+                videoPlayer.pause();
+            }
         });
     </script>
 </body>
